@@ -1,43 +1,31 @@
 const mongoose = require("../../database");
 const bcrypt = require("bcryptjs");
 
-const UserSchema = new mongoose.Schema({
-  name: {
+const ProjectSchema = new mongoose.Schema({
+  title: {
     type: String,
     require: true,
   },
-  email: {
+  description:{
     type: String,
-    unique: true,
-    required: true,
-    lowercase: true,
+    require: true,
   },
-  passwordResetToken: {
-    type: String,
-    select: false,
+  user:{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    require: true,
   },
-  passwordResetExpires: {
-    type: Date,
-    select: false,
-  },
-  password: {
-    type: String,
-    required: true,
-    select: false,
-  },
+  tasks:[{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Task',    
+  }],
   createdAt: {
     type: Date,
     default: Date.now,
   },
 });
 
-UserSchema.pre("save", async function (next) {
-  const hash = await bcrypt.hash(this.password, 10);
-  this.password = hash;
 
-  next();
-});
+const Project = mongoose.model("Project", ProjectSchema);
 
-const User = mongoose.model("User", UserSchema);
-
-module.exports = User;
+module.exports = Project;
